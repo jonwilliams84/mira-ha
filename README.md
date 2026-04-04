@@ -17,7 +17,6 @@ Works through ESPHome Bluetooth proxies — no USB dongle or direct BLE connecti
 ## Supported Devices
 
 - Mira Mode digital shower
-- Mira Activate digital shower
 
 Any device advertising BLE service UUID `bccb0001-ca66-11e5-88a4-0002a5d5c51b` should work.
 
