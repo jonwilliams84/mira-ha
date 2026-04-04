@@ -1,0 +1,29 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Mira Mode Setup",
+        "description": "Select a discovered Mira Mode device, or enter a BLE address manually.",
+        "data": {
+          "address": "Device Address",
+          "device_name": "Device Name (optional)"
+        }
+      },
+      "bluetooth_confirm": {
+        "title": "Mira Mode Discovered",
+        "description": "A Mira Mode device was discovered: **{name}** ({address}). Would you like to set it up?"
+      },
+      "pair": {
+        "title": "Pair with {name}",
+        "description": "To pair with **{name}** ({address}):\n\n1. **Hold the outlet button on the shower unit for 5 seconds** to enter pairing mode.\n2. The LED should start flashing.\n3. Press **Submit** below to send the pairing command.\n\nMake sure you are within Bluetooth range (or have an ESPHome BLE proxy nearby)."
+      }
+    },
+    "error": {
+      "pairing_failed": "Pairing failed. Make sure the device is in pairing mode (hold outlet button for 5 seconds) and try again.",
+      "unknown": "An unexpected error occurred. Check the logs for details."
+    },
+    "abort": {
+      "already_configured": "This device is already configured."
+    }
+  }
+}
