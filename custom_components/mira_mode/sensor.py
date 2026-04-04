@@ -33,6 +33,7 @@ class MiraModeActualTempSensor(CoordinatorEntity[MiraModeCoordinator], SensorEnt
     _attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
     _attr_has_entity_name = True
     _attr_suggested_display_precision = 1
+    _attr_icon = "mdi:thermometer-water"
 
     def __init__(
         self, coordinator: MiraModeCoordinator, entry: ConfigEntry,

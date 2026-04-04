@@ -35,6 +35,7 @@ class MiraModeTemperatureNumber(CoordinatorEntity[MiraModeCoordinator], NumberEn
     _attr_native_step = TEMP_STEP
     _attr_mode = NumberMode.SLIDER
     _attr_has_entity_name = True
+    _attr_icon = "mdi:thermometer"
 
     def __init__(
         self, coordinator: MiraModeCoordinator, entry: ConfigEntry,

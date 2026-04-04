@@ -34,6 +34,7 @@ class MiraModeOutletSwitch(CoordinatorEntity[MiraModeCoordinator], SwitchEntity)
     _attr_device_class = SwitchDeviceClass.SWITCH
     _attr_has_entity_name = True
     _attr_assumed_state = True
+    _attr_icon = "mdi:shower"
 
     def __init__(
         self, coordinator: MiraModeCoordinator, entry: ConfigEntry,
