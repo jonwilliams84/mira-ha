@@ -35,9 +35,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
-    entry.async_on_unload(
-        lambda: hass.async_create_task(device.disconnect())
-    )
+    entry.async_on_unload(device.disconnect)
     return True
 
 
@@ -45,5 +43,8 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if unload_ok:
         coordinator: MiraModeCoordinator = hass.data[DOMAIN].pop(entry.entry_id)
-        await coordinator.device.disconnect()
+        try:
+            await coordinator.device.disconnect()
+        except Exception:
+            _LOGGER.warning("Error disconnecting device during unload", exc_info=True)
     return unload_ok

@@ -34,6 +34,7 @@ class MiraModeOutletSwitch(CoordinatorEntity[MiraModeCoordinator], SwitchEntity)
     _attr_device_class = SwitchDeviceClass.SWITCH
     _attr_has_entity_name = True
     _attr_assumed_state = True
+    _attr_icon = "mdi:shower"
 
     def __init__(
         self, coordinator: MiraModeCoordinator, entry: ConfigEntry,
@@ -43,7 +44,8 @@ class MiraModeOutletSwitch(CoordinatorEntity[MiraModeCoordinator], SwitchEntity)
         self._outlet = outlet
         self._address = address
         self._attr_unique_id = f"{address}_outlet_{outlet}"
-        self._attr_name = f"Outlet {outlet}"
+        self._attr_name = "Shower" if outlet == 1 else "Bath"
+        self._attr_icon = "mdi:shower" if outlet == 1 else "mdi:bathtub"
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, address)},
             name=device_name,
