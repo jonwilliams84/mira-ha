@@ -48,7 +48,12 @@ CONF_DEVICE_NAME = "device_name"
 CONF_ADDRESS = "address"
 
 # Coordinator
-UPDATE_INTERVAL = 30  # seconds
+UPDATE_INTERVAL = 30  # seconds  (default; configurable via options flow)
+UPDATE_INTERVAL_MIN = 10
+UPDATE_INTERVAL_MAX = 600
+
+# Options flow keys
+CONF_UPDATE_INTERVAL = "update_interval"
 CONNECT_TIMEOUT = 15.0  # seconds
 COMMAND_TIMEOUT = 10.0  # seconds
 PAIR_TIMEOUT = 60.0  # seconds - BLE pairing handshake can take a long time

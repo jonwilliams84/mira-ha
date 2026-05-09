@@ -15,15 +15,19 @@ from homeassistant.components.bluetooth import (
     BluetoothServiceInfoBleak,
     async_discovered_service_info,
 )
-from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
+from homeassistant.config_entries import ConfigEntry, ConfigFlow, ConfigFlowResult, OptionsFlow
 from homeassistant.const import CONF_ADDRESS
 
 from .const import (
     CONF_CLIENT_ID,
     CONF_DEVICE_NAME,
     CONF_SLOT,
+    CONF_UPDATE_INTERVAL,
     DOMAIN,
     SERVICE_UUID,
+    UPDATE_INTERVAL,
+    UPDATE_INTERVAL_MAX,
+    UPDATE_INTERVAL_MIN,
 )
 from .mira_protocol import MiraModeBLEDevice
 
@@ -180,4 +184,38 @@ class MiraModeConfigFlow(ConfigFlow, domain=DOMAIN):
                 "name": self._name or "Mira",
                 "address": self._address or "Unknown",
             },
+        )
+
+
+    @staticmethod
+    def async_get_options_flow(config_entry: ConfigEntry) -> OptionsFlow:
+        """Return the options flow handler."""
+        return MiraModeOptionsFlow(config_entry)
+
+
+class MiraModeOptionsFlow(OptionsFlow):
+    """Options flow for Mira Mode."""
+
+    def __init__(self, config_entry: ConfigEntry) -> None:
+        """Initialize options flow."""
+        self.config_entry = config_entry
+
+    async def async_step_init(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Manage the integration's options."""
+        if user_input is not None:
+            return self.async_create_entry(title="", data=user_input)
+
+        current = self.config_entry.options.get(CONF_UPDATE_INTERVAL, UPDATE_INTERVAL)
+        return self.async_show_form(
+            step_id="init",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(CONF_UPDATE_INTERVAL, default=current): vol.All(
+                        vol.Coerce(int),
+                        vol.Range(min=UPDATE_INTERVAL_MIN, max=UPDATE_INTERVAL_MAX),
+                    ),
+                }
+            ),
         )
