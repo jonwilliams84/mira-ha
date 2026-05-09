@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from datetime import timedelta
 
@@ -15,16 +16,22 @@ from .mira_protocol import MiraDeviceState, MiraModeBLEDevice
 
 _LOGGER = logging.getLogger(__name__)
 
-_BLE_ERRORS = (BleakError, TimeoutError, Exception)
+_BLE_ERRORS = (BleakError, TimeoutError, asyncio.TimeoutError, OSError)
 
 
 class MiraModeCoordinator(DataUpdateCoordinator[MiraDeviceState | None]):
 
-    def __init__(self, hass: HomeAssistant, device: MiraModeBLEDevice, name: str) -> None:
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        device: MiraModeBLEDevice,
+        name: str,
+        update_interval: int = UPDATE_INTERVAL,
+    ) -> None:
         super().__init__(
             hass, _LOGGER,
             name=f"Mira Mode {name}",
-            update_interval=timedelta(seconds=UPDATE_INTERVAL),
+            update_interval=timedelta(seconds=update_interval),
         )
         self.device = device
         self._consecutive_failures = 0
@@ -35,16 +42,21 @@ class MiraModeCoordinator(DataUpdateCoordinator[MiraDeviceState | None]):
             state = await self.device.get_device_state()
             if state is None:
                 self._consecutive_failures += 1
-                _LOGGER.warning(
+                await self.device.disconnect()
+                if self._consecutive_failures >= self._max_failures:
+                    failures = self._consecutive_failures
+                    self._consecutive_failures = 0
+                    _LOGGER.warning(
+                        "No response from %s after %d attempts, marking unavailable",
+                        self.device.address, failures,
+                    )
+                    raise UpdateFailed(
+                        f"No response from {self.device.address} after {failures} attempts"
+                    )
+                _LOGGER.debug(
                     "No response from %s (attempt %d/%d), returning last known state",
                     self.device.address, self._consecutive_failures, self._max_failures,
                 )
-                await self.device.disconnect()
-                if self._consecutive_failures >= self._max_failures:
-                    self._consecutive_failures = 0
-                    raise UpdateFailed(
-                        f"No response from {self.device.address} after {self._max_failures} attempts"
-                    )
                 return self.data
             self._consecutive_failures = 0
             return state
@@ -60,7 +72,7 @@ class MiraModeCoordinator(DataUpdateCoordinator[MiraDeviceState | None]):
                 )
                 self._consecutive_failures = 0
                 raise UpdateFailed(f"BLE error: {err}") from err
-            _LOGGER.warning(
+            _LOGGER.debug(
                 "Transport error from %s (attempt %d/%d), returning last known state: %s",
                 self.device.address, self._consecutive_failures, self._max_failures, err,
             )
@@ -69,7 +81,7 @@ class MiraModeCoordinator(DataUpdateCoordinator[MiraDeviceState | None]):
     async def async_set_outlet(self, outlet: int, state: bool) -> None:
         try:
             await self.device.set_outlet(outlet, state)
-        except (BleakError, TimeoutError, Exception) as err:
+        except (BleakError, TimeoutError, OSError, asyncio.TimeoutError) as err:
             _LOGGER.error("Failed to set outlet %d: %s", outlet, err)
             await self.device.disconnect()
             raise
@@ -77,7 +89,7 @@ class MiraModeCoordinator(DataUpdateCoordinator[MiraDeviceState | None]):
     async def async_set_temperature(self, temperature: float) -> None:
         try:
             await self.device.set_temperature(temperature)
-        except (BleakError, TimeoutError, Exception) as err:
+        except (BleakError, TimeoutError, OSError, asyncio.TimeoutError) as err:
             _LOGGER.error("Failed to set temperature: %s", err)
             await self.device.disconnect()
             raise
@@ -85,7 +97,7 @@ class MiraModeCoordinator(DataUpdateCoordinator[MiraDeviceState | None]):
     async def async_activate_preset(self, preset: int) -> None:
         try:
             await self.device.activate_preset(preset)
-        except (BleakError, TimeoutError, Exception) as err:
+        except (BleakError, TimeoutError, OSError, asyncio.TimeoutError) as err:
             _LOGGER.error("Failed to activate preset %d: %s", preset, err)
             await self.device.disconnect()
             raise

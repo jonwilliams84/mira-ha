@@ -332,7 +332,7 @@ class MiraModeBLEDevice:
         try:
             ble_response = expect_response
             await self._client.write_gatt_char(WRITE_CHAR_UUID, frame, response=ble_response)
-        except (BleakError, TimeoutError, Exception) as exc:
+        except (BleakError, TimeoutError, OSError, asyncio.TimeoutError) as exc:
             self._connected = False
             self._client = None
             if not isinstance(exc, BleakError):

@@ -25,5 +25,19 @@
     "abort": {
       "already_configured": "This device is already configured."
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Mira Mode Options",
+        "description": "Tune polling behaviour for this device.",
+        "data": {
+          "update_interval": "Polling interval (seconds)"
+        },
+        "data_description": {
+          "update_interval": "How often to query the shower over BLE. Larger values reduce log noise on flaky links; smaller values give faster state updates. Range: 10-600 seconds."
+        }
+      }
+    }
   }
 }
