@@ -189,8 +189,14 @@ class MiraModeConfigFlow(ConfigFlow, domain=DOMAIN):
 
     @staticmethod
     def async_get_options_flow(config_entry: ConfigEntry) -> OptionsFlow:
-        """Return the options flow handler."""
-        return MiraModeOptionsFlow(config_entry)
+        """Return the options flow handler.
+
+        On HA 2024.12+ the flow manager auto-injects ``config_entry`` into
+        the returned ``OptionsFlow`` — we must NOT pass it ourselves
+        (the base class's ``config_entry`` is now a read-only property,
+        and ``__init__`` accepts no args).
+        """
+        return MiraModeOptionsFlow()
 
 
 class MiraModeOptionsFlow(OptionsFlow):
