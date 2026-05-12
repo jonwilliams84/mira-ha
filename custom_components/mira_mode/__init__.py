@@ -17,6 +17,7 @@ from .const import (
     UPDATE_INTERVAL,
 )
 from .coordinator import MiraModeCoordinator
+from .debug_service import async_register_debug_services
 from .mira_protocol import MiraModeBLEDevice
 
 _LOGGER = logging.getLogger(__name__)
@@ -42,6 +43,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][entry.entry_id] = coordinator
+
+    # Register on-demand debug services (idempotent — service-call only,
+    # no background activity). Useful for diagnosing pairing/connection
+    # issues and identifying Mira product variants by GATT tree.
+    async_register_debug_services(hass)
 
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
 
