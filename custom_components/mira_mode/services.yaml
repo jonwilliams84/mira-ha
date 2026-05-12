@@ -1,0 +1,18 @@
+debug_enumerate:
+  name: Debug — enumerate GATT tree
+  description: >-
+    Connect to any BLE device by address (via HA's bluetooth manager, so
+    proxies work) and return its full service / characteristic / descriptor
+    tree as response_data. On-demand only — useful for diagnosing pairing
+    issues with a Mira Mode shower, identifying which Mira product a device
+    is (Mode vs. Activate etc.), or generally inspecting an unknown BLE
+    device. The connection is opened, the tree is walked, then the
+    connection is closed — no ongoing polling.
+  fields:
+    address:
+      name: BLE address
+      description: The MAC address of the BLE device to enumerate (e.g. E5:B6:22:B1:DF:6D).
+      required: true
+      example: "E5:B6:22:B1:DF:6D"
+      selector:
+        text:
