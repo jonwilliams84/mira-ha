@@ -194,11 +194,13 @@ class MiraModeConfigFlow(ConfigFlow, domain=DOMAIN):
 
 
 class MiraModeOptionsFlow(OptionsFlow):
-    """Options flow for Mira Mode."""
+    """Options flow for Mira Mode.
 
-    def __init__(self, config_entry: ConfigEntry) -> None:
-        """Initialize options flow."""
-        self.config_entry = config_entry
+    Note: In HA 2024.12+ ``OptionsFlow.config_entry`` is a read-only
+    auto-populated property. Don't assign it in ``__init__`` — doing so
+    raises ``AttributeError: property 'config_entry' has no setter`` and
+    the config-flow UI fails with HTTP 500.
+    """
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
